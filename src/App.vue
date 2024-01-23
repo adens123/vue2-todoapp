@@ -1,28 +1,53 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <AddTodo @add-todo="addTodoHandler" />
+    <TodoList
+      :todos="todos"
+      @delete-todo="deleteTodoHandler"
+      @completed-toggle="completedToggleHandler" />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import AddTodo from "./components/AddTodo.vue";
+import TodoList from "./components/TodoList.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
+    TodoList,
+    AddTodo
+  },
+  data() {
+    return {
+      todos: []
+    };
+  },
+  methods: {
+    addTodoHandler(todo) {
+      this.todos.push({ ...todo, completed: false });
+    },
+    deleteTodoHandler(index) {
+      this.todos.splice(index, 1);
+    },
+    completedToggleHandler(index) {
+      this.todos[index].completed = !this.todos[index].completed;
+    }
+  },
+  watch: {
+    todos: {
+      handler() {
+        localStorage.setItem("todos", JSON.stringify(this.todos));
+      },
+      deep: true
+    }
+  },
+  mounted() {
+    if (localStorage.getItem("todos")) {
+      this.todos = JSON.parse(localStorage.getItem("todos"));
+    }
   }
-}
+};
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+<style></style>
